@@ -14,37 +14,37 @@ class Tyra:
         '''creates the db reference'''
         self.db = redis.Redis(host='68.55.32.96')
 
-    def getFunctionList(self):
-        '''get the list of functions available'''
-        return _toStrings(list(self.db.smembers('_functions_')))
+    def getDatasetList(self):
+        '''get the list of datasets available'''
+        return _toStrings(list(self.db.smembers('datasets')))
 
-    def getDimensions(self,function):
-        '''get the dimensions for a given function'''
-        return _toStrings(list(self.db.smembers(_under(function)+'|dimensions')))
+    def getDimensions(self,dataset):
+        '''get the dimensions for a given dataset'''
+        return _toStrings(list(self.db.smembers(_under(dataset)+'||dimensions')))
 
-    def getDimensionLabels(self, function, dimension):
+    def getDimensionLabels(self, dataset, dimension):
         '''get the labels for a given dimension'''
-        return _toStrings(list(self.db.smembers(_under(function)+'|'+_under(dimension))))
+        return _toStrings(list(self.db.smembers(_under(dataset)+'||'+_under(dimension))))
 
-    def getProperty(self, function, property):
-        '''get a property for a given function'''
-        return str(self.db.get(_under(function)+'|'+_under(property)))
+    def getProperty(self, dataset, property):
+        '''get a property for a given dataset'''
+        return str(self.db.get(_under(dataset)+'||'+_under(property)))
 
 def main():
     '''prints a sort of index of what is in the db'''
-    smy = Tyra()
+    tyra = Tyra()
 
-    functions = smy.getFunctionList()
-    for ff in functions:
+    datasets = tyra.getDatasetList()
+    for dd in datasets:
         print ' - ' + ff
-        print '   Source: ' + smy.getProperty(ff, 'source')
-        print '   URL: ' + smy.getProperty(ff, 'url')
-        print '   Units: ' + smy.getProperty(ff, 'units')
+        print '   Source: ' + tyra.getProperty(ff, 'source')
+        print '   URL: ' + tyra.getProperty(ff, 'url')
+        print '   Units: ' + tyra.getProperty(ff, 'units')
         print '   Dimensions:'
-        dims = smy.getDimensions(ff)
+        dims = tyra.getDimensions(ff)
         for dd in dims:
             print '   - ' + dd
-            #labels = smy.getDimensionLabels(ff, dd)
+            #labels = tyra.getDimensionLabels(ff, dd)
             #for ll in labels:
             #    print '     - ' + ll
         print
