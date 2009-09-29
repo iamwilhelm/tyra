@@ -12,11 +12,49 @@ def _under(str):
 class Tyra:
     def __init__(self):
         '''creates the db reference'''
-        self.db = redis.Redis(host='68.55.32.96')
+        self.db = redis.Redis(host='68.55.32.96', db=2)
 
-    def getDatasetList(self):
-        '''get the list of datasets available'''
-        return _toStrings(list(self.db.smembers('datasets')))
+    def lookup(self, searchStr):
+        """
+        >>> tyra = Tyra()
+        >>> print tyra.lookup('Oil')
+        ['Oil||Category||production', 'Oil||Category||consumption|motor', 'Oil||Category||consumption|heat', 'Oil||Category||consumption', 'Oil||Category||consumption|kill']
+        >>> print tyra.lookup('Gold')
+        []
+        >>> print tyra.lookup('heat')
+        ['Oil||Category||consumption|heat']
+        """
+        ret = []
+
+        # get list of all datasets
+        datasets = map(lambda x: str(x), self.db.smembers('datasets'))
+
+        # check all dimensions for search string
+        for dd in datasets:
+            dimensions = self.db.smembers(dd+'||dimensions')
+            for dim in dimensions:
+                # add any that match, look inside category
+                if searchStr in dim:
+                    ret.append(dd+'||'+dim)
+                elif 'Category' == dim:
+                    for cc in self.db.smembers(dd+'||Category'):
+                        if searchStr in cc:
+                            ret.append(dd+'||'+dim+'||'+cc)
+
+        # filter datasets by search string
+        for dd in datasets:
+            if searchStr in dd:
+                # check the rest, skip state and year, look inside category
+                for dim in dimensions:
+                    if dim == 'State' or dim == 'Year':
+                        continue
+                    if dim == 'Category':
+                        for cc in self.db.smembers(dd+'||Category'):
+                            ret.append(dd+'||'+dim+'||'+cc)
+                    else:
+                        ret.append(dd+'||'+dim)
+
+        return map(lambda x: str(x), ret)
 
     def getDimensions(self,dataset):
         '''get the dimensions for a given dataset'''
@@ -34,20 +72,22 @@ def main():
     '''prints a sort of index of what is in the db'''
     tyra = Tyra()
 
-    datasets = tyra.getDatasetList()
-    for dd in datasets:
-        print ' - ' + ff
-        print '   Source: ' + tyra.getProperty(ff, 'source')
-        print '   URL: ' + tyra.getProperty(ff, 'url')
-        print '   Units: ' + tyra.getProperty(ff, 'units')
-        print '   Dimensions:'
-        dims = tyra.getDimensions(ff)
-        for dd in dims:
-            print '   - ' + dd
-            #labels = tyra.getDimensionLabels(ff, dd)
-            #for ll in labels:
-            #    print '     - ' + ll
-        print
+    datasets = tyra.lookup('Oil')
+    #for dd in datasets:
+    #    print ' - ' + ff
+    #    print '   Source: ' + tyra.getProperty(ff, 'source')
+    #    print '   URL: ' + tyra.getProperty(ff, 'url')
+    #    print '   Units: ' + tyra.getProperty(ff, 'units')
+    #    print '   Dimensions:'
+    #    dims = tyra.getDimensions(ff)
+    #    for dd in dims:
+    #        print '   - ' + dd
+    #        #labels = tyra.getDimensionLabels(ff, dd)
+    #        #for ll in labels:
+    #        #    print '     - ' + ll
+    #    print
+
 
 if __name__ == '__main__':
-    main()
+    import doctest
+    doctest.testmod()
