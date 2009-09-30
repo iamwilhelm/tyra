@@ -31,14 +31,24 @@ class Tyra:
         >>> tyra = Tyra(2)
         >>> print tyra.lookup('Oil')
         ['Oil||production', 'Oil||consumption|motor', 'Oil||consumption|heat', 'Oil||consumption', 'Oil||consumption|kill']
+        >>> print tyra.lookup('oil')
+        ['Oil||production', 'Oil||consumption|motor', 'Oil||consumption|heat', 'Oil||consumption', 'Oil||consumption|kill']
         >>> print tyra.lookup('Gold')
         []
         >>> print tyra.lookup('heat')
         ['Oil||consumption|heat']
         >>> print tyra.lookup('consumption')
         ['Oil||consumption|motor', 'Oil||consumption|heat', 'Oil||consumption', 'Oil||consumption|kill']
+        >>> print tyra.lookup('Pygmy')
+        ['Whales||Pygmy Whale']
+        >>> print tyra.lookup('pygmy')
+        ['Whales||Pygmy Whale']
+        >>> print tyra.lookup('Banks')
+        []
         """
         ret = []
+
+        searchStr = searchStr.lower()
 
         # get list of all datasets
         datasets = _toStrings(self.db.smembers('datasets'))
@@ -47,18 +57,16 @@ class Tyra:
         for dd in datasets:
             dimensions = list(self.db.smembers(dd+'||dimensions'))
             dimensions = self._expandCategory(dd, dimensions)
-            for dim in dimensions:
-                # add any that match, look inside category
-                if searchStr in dim:
-                    ret.append(dd+'||'+dim)
+            for dim in filter(lambda x: searchStr in x.lower(), dimensions):
+                ret.append(dd+'||'+dim)
 
-        # filter datasets by search string
-        for dd in datasets:
-            if searchStr in dd:
-                # check the rest, skip state and year, look inside category
-                for dim in dimensions:
-                    if not dim == 'State' and not dim == 'Year':
-                        ret.append(dd+'||'+dim)
+        # filter datasets by search string. if a dataset matched, include all its data dimensions
+        for dd in filter(lambda x: searchStr in x.lower(), datasets):
+            dimensions = list(self.db.smembers(dd+'||dimensions'))
+            dimensions = self._expandCategory(dd, dimensions)
+            dataDims = filter(lambda x: not x == 'State' and not x == 'Year', dimensions)
+            for dim in dataDims:
+                ret.append(dd+'||'+dim)
 
         return _toStrings(ret)
 
@@ -109,3 +117,4 @@ class Tyra:
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
