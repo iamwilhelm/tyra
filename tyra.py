@@ -9,9 +9,9 @@ def _under(str):
     return str.replace(' ','_')
         
 class Tyra:
-    def __init__(self, db=0):
+    def __init__(self, db=0, host='68.55.32.96'):
         '''creates the db reference'''
-        self.db = redis.Redis(host='68.55.32.96', db=db)
+        self.db = redis.Redis(host=host, db=db)
 
     def _expandCategory(self, dataset, dimensions):
         """
