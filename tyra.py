@@ -70,6 +70,31 @@ class Tyra:
 
         return _toStrings(ret)
 
+    def _getMeta(self, metaSet, fieldName):
+        """
+        >>> tyra = Tyra(2)
+        >>> meta = tyra.db.smembers('Whales||meta')
+        >>> print tyra._getMeta(meta, 'source')
+        Greenpeace
+        >>> print tyra._getMeta(meta, 'url')
+        http://www.gp.org/whales.csv
+        >>> print tyra._getMeta(meta, 'default')
+        State
+        >>> print tyra._getMeta(None, 'source')
+        None
+        >>> print tyra._getMeta(meta, 'cow')
+        None
+        """
+        if metaSet==None:
+            return None
+        fields = filter(lambda x: x.startswith(fieldName + '||'), metaSet)
+        if (len(fields)==0):
+            return None
+        val = str(fields[0]).partition('||')[2]
+        if (len(val)==0):
+            return None;
+        return val
+
 
     def getData(self, dimension, xAxis=None, xAxisLabels=None, zAxis=None):
         """
@@ -95,10 +120,11 @@ class Tyra:
             keyList['Category'] = caty
         else:
             dataset = dimension
+        meta = self.db.smembers(dataset+'||meta')
 
         # get xAxis, check default if not passed in
         if xAxis == None:
-            xAxis = str(self.db.get(dataset+'||default'))
+            xAxis = self._getMeta(meta, 'default')
 
         # get dimensions for this dataset
         dimensions = _toStrings(list(self.db.smembers(dataset+'||dimensions')))
@@ -132,9 +158,10 @@ class Tyra:
         ret['xAxis'] = xAxis
         ret['xAxisLabels'] = xAxisLabels
         ret['data'] = data
-        ret['units'] = str(self.db.get(dataset+'||units'))
-        ret['source'] = str(self.db.get(dataset+'||source'))
+        ret['units'] = self._getMeta(meta, 'units')
+        ret['source'] = self._getMeta(meta, 'source')
         return ret
+
 # run tests
 if __name__ == '__main__':
     import doctest
