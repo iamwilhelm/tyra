@@ -3,7 +3,7 @@
 from redis.redis import Redis
 
 def _toStrings(list):
-    return map(lambda x: str(x), list)
+    return [str(x) for x in list]
 
 def _under(str):
     return str.replace(' ','_')
@@ -52,6 +52,7 @@ class Tyra:
 
         # get list of all datasets
         datasets = _toStrings(self.db.smembers('datasets'))
+        datasets = [ _under(x) for x in datasets ]
 
         # check all dimensions for search string
         for dd in datasets:
