@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import redis
+from redis.redis import Redis
 
 def _toStrings(list):
     return map(lambda x: str(x), list)
@@ -11,7 +11,7 @@ def _under(str):
 class Tyra:
     def __init__(self, db=0, host='68.55.32.96'):
         '''creates the db reference'''
-        self.db = redis.Redis(host=host, db=db)
+        self.db = Redis(host=host, db=db)
 
     def _expandCategory(self, dataset, dimensions):
         """
