@@ -149,8 +149,7 @@ class Tyra:
         data = []
         for ss in xAxisLabels:
             keyList[xAxis] = ss
-            key = dataset+'||'+'||'.join(map(lambda x: keyList[x], dimensions))
-            key = key.replace(' ','_')
+            key = _under(dataset+'||'+'||'.join([ keyList[x] for x in dimensions ]))
             val = self.db.get(key)
             data.append(float(self.db.get(key)))
 
