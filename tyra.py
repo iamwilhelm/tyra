@@ -67,7 +67,7 @@ class Tyra:
         for dd in filter(lambda x: searchStr in x.lower(), datasets):
             dimensions = list(self.db.smembers(dd+'||dimensions'))
             dimensions = self._expandCategory(dd, dimensions)
-            dataDims = filter(lambda x: not x == 'State' and not x == 'Year', dimensions)
+            dataDims = filter(lambda x: x != 'State' and x != 'Year', dimensions)
             for dim in dataDims:
                 ret.append(dd+'||'+dim)
 
