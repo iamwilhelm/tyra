@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
-import sys, json
+import sys, json, traceback
 sys.path.append('redis')
 import redis
+
+VERSION = '0.1.1'
 
 def _toStrings(list):
     return [ str(x) for x in list ]
@@ -78,6 +80,8 @@ class Tyra:
             dataset = dimension
 
         self.db.select(self.dataDbNum)
+        if not self.db.exists(dataset):
+            raise Exception("dataset not found")
         meta = json.loads(self.db.get(dataset))
 
         # get xAxis, check default if not passed in
@@ -145,9 +149,82 @@ class Tyra:
         ret['source'] = source
         return ret
 
-# run tests
+    def printMeta(self, dataset):
+        if not self.db.exists(dataset):
+            raise Exception("dataset not found")
+        meta = json.loads(self.db.get(dataset))
+
+        print '\n'+dataset
+        print str(meta['descr'])
+        print ' default: ' + meta['default']
+        print ' units:\n   ' + '\n   '.join( str(x[0])+' = '+x[1] for x in meta['units'].items() )
+        for dd in meta['dims']:
+            print ' dim: ' + dd
+            print '   ' + '\n   '.join( str(x[0])+'. '+x[1] for x in enumerate(meta['dims'][dd], 1) )
+        for ss in meta['sources']:
+            print ' sources: ' + ss
+            print'   ' + '\n   '.join( str(x[0])+' = '+x[1] for x in meta['sources'][ss].items() )
+
+def printHelp():
+    print 'Usage: tyra.py [Options]'
+    print ''
+    print 'Options:'
+    print ' -l search       lookup given search term'
+    print ' -m dataset      retrieve metadata for given dataset'
+    print ' -n num          base database number'
+    print ' -v              print version and exit'
+    print ' -h              show this and exit'
+    print ' -t              run unit tests'
+
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
-    #tyra = Tyra(2)
-    #print tyra.getData('Whales||Humpback_Whale')
+    print 'tyra v' + VERSION
+    
+    # parse command line args
+    if len(sys.argv) == 1 or sys.argv[1] == '-h':
+        printHelp()
+        sys.exit(0)
+
+    lookup = False
+    meta = False
+    dbNum = 0
+
+    try:
+        ii = 1
+        while ii<len(sys.argv):
+            if sys.argv[ii] == '-t':
+                import doctest
+                doctest.testmod()
+                sys.exit(0)
+            elif sys.argv[ii] == '-v':
+                sys.exit(0)
+            elif sys.argv[ii] == '-l':
+                if not len(sys.argv) > ii+1:
+                    raise Exception('-l option requires search term')
+                ii+=1
+                search = sys.argv[ii]
+                lookup = True
+            elif sys.argv[ii] == '-m':
+                if not len(sys.argv) > ii+1:
+                    raise Exception('-m option requires dataset name')
+                ii+=1
+                dataset = sys.argv[ii]
+                meta = True
+            elif sys.argv[ii] == '-n':
+                if not len(sys.argv) > ii+1:
+                    raise Exception('-n option requires number argument')
+                ii+=1
+                dbNum = int(sys.argv[ii])
+            ii+=1
+
+        if lookup:
+            dw = Tyra(dbNum)
+            print '\n'.join( str(x[0])+'. '+x[1] for x in enumerate(dw.lookup(search), 1) )
+        elif meta:
+            dw = Tyra(dbNum+1)
+            dw.printMeta(dataset)
+        else:
+            printHelp()
+
+    except Exception,ex:
+        print 'FAIL: ' + str(ex)
+        print traceback.print_exc()
