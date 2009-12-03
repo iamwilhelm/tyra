@@ -109,11 +109,11 @@ class Tyra:
 
         # pull the actual data
         ret = dict()
-        data = []
+        dataKeys = []
         for ss in xAxisLabels:
             keyList[xAxis] = ss
-            key = _under(dataset+'|'+'|'.join([ keyList[x] for x in dims ]))
-            data.append(str(self.db.get(key)))
+            dataKeys.append(_under(dataset+'|'+'|'.join( keyList[x] for x in dims )))
+        data = map(str, self.db.mget(*dataKeys))
 
         # find units and sources
         if caty!=None and caty in meta['units']:
