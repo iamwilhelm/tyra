@@ -6,11 +6,9 @@ import redis
 
 VERSION = '0.1.1'
 
-def _toStrings(list):
-    return [ str(x) for x in list ]
-
-def _under(str):
-    return str.replace(' ','_')
+def _toKey(str):
+    ''' lowercase and underscore a string '''
+    return str.replace(' ','_').lower()
         
 class Tyra:
     def __init__(self, dbNum=0, host='68.55.32.96'):
@@ -48,7 +46,7 @@ class Tyra:
         for tt in searchStr.lower().split():
             keys = keys.union(self.db.keys("*"+tt+"*"))
 
-        return _toStrings(keys)
+        return map(str, keys)
 
     def getData(self, dimension, xAxis=None, xAxisLabels=None, zAxis=None):
         """
@@ -79,6 +77,7 @@ class Tyra:
         else:
             dataset = dimension
 
+        dataset = _toKey(dataset)
         self.db.select(self.dataDbNum)
         if not self.db.exists(dataset):
             raise Exception("dataset not found")
@@ -116,7 +115,7 @@ class Tyra:
         dataKeys = []
         for ss in xAxisLabels:
             keyList[xAxis] = ss
-            dataKeys.append(_under(dataset+'|'+'|'.join( keyList[x] for x in dims )))
+            dataKeys.append(_toKey(dataset+'|'+'|'.join( keyList[x] for x in dims )))
         data = map(str, self.db.mget(*dataKeys))
 
         # find units and sources
@@ -150,6 +149,7 @@ class Tyra:
         return ret
 
     def printMeta(self, dataset):
+        dataset = _toKey(dataset)
         if not self.db.exists(dataset):
             raise Exception("dataset not found")
         meta = json.loads(self.db.get(dataset))
