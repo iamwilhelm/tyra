@@ -54,9 +54,9 @@ class Tyra:
         >>> print tyra.getData('Number_of_Banks')
         {'source': ['fake'], 'xAxis': 'Year', 'units': 'Buildings', 'xAxisLabels': ['1980', '1981', '1982', '1983', '1984', '1985', '1986', '1987', '1988', '1989', '1990', '1991', '1992'], 'data': ['5154.872312', '5149.455017', '5146.638686', '5152.872294', '5153.364456', '5153.188586', '5157.434761', '5152.977374', '5154.324641', '5149.665051', '5156.041648', '5152.083429', '5154.486292'], 'dimension': 'Number_of_Banks'}
         >>> print tyra.getData('Oil|Production')
-        {'source': ['dunno'], 'xAxis': 'Year', 'units': 'Barrels', 'xAxisLabels': ['1995', '1996', '1997', '1998', '1999', '2000'], 'data': ['2592.86774424', '2562.55720776', '2536.98436633', '2506.79740009', '2478.74694232', '2450.37708393'], 'dimension': 'Oil|Production'}
+        {'source': ['fake'], 'xAxis': 'Year', 'units': 'Barrels', 'xAxisLabels': ['1995', '1996', '1997', '1998', '1999', '2000'], 'data': ['2592.86774424', '2562.55720776', '2536.98436633', '2506.79740009', '2478.74694232', '2450.37708393'], 'dimension': 'Oil|Production'}
         >>> print tyra.getData('Oil|Production', 'State', ['Alabama', 'Arizona', 'Alaska'])
-        {'source': ['dunno'], 'xAxis': 'State', 'units': 'Barrels', 'xAxisLabels': ['Alabama', 'Arizona', 'Alaska'], 'data': ['416.8514642', '120.7614268', '204.5478127'], 'dimension': 'Oil|Production'}
+        {'source': ['fake'], 'xAxis': 'State', 'units': 'Barrels', 'xAxisLabels': ['Alabama', 'Arizona', 'Alaska'], 'data': ['416.8514642', '120.7614268', '204.5478127'], 'dimension': 'Oil|Production'}
         >>> print tyra.getData('Number_of_Banks', 'State')
         {'source': ['fake'], 'xAxis': 'State', 'units': 'Buildings', 'xAxisLabels': ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'], 'data': ['1312.577498', '1313.570072', '1316.950799', '1314.852173', '1315.207059', '1313.641267', '1313.48346', '1313.988841', '1315.878175', '1311.5455', '1317.073607', '1313.706553', '1314.196757', '1313.285641', '1313.228885', '1309.447477', '1312.55034', '1310.635966', '1311.729267', '1315.754047', '1317.167189', '1311.781638', '1308.10401', '1314.52436', '1310.993201', '1312.625031', '1314.583995', '1315.174767', '1312.873398', '1312.006197', '1314.726538', '1312.02684', '1312.597191', '1312.272497', '1311.519995', '1312.084874', '1316.361947', '1310.318791', '1311.883353', '1311.545868', '1313.234157', '1313.605544', '1318.224285', '1312.210721', '1315.314095', '1319.513678', '1312.946723', '1315.516379', '1313.220016', '1312.218818', '1312.925067'], 'dimension': 'Number_of_Banks'}
         >>> print tyra.getData('Whales')
@@ -124,7 +124,13 @@ class Tyra:
             units = None
 
         if len(meta['otherDims'])!=0:
-            source = ['dunno']
+            source = []
+            for dd,vv in otherDims.items():
+                if vv=='Total':
+                    source += [ str(x['source']) for x in meta['sources'].values() ]
+                else:
+                    source += [ str(x['source']) for x in [ x[1] for x in meta['sources'].items() if x[0] in vv ] ]
+            source = list(set(source))
         elif 'default' in meta['sources']:
             source = [str(meta['sources']['default']['source'])]
         else:
