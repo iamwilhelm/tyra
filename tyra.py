@@ -186,7 +186,7 @@ if __name__ == '__main__':
 
     lookup = False
     meta = False
-    dbNum = 0
+    dbNum = 2
 
     try:
         ii = 1
