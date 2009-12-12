@@ -4,7 +4,7 @@ import sys, json, traceback
 sys.path.append('redis')
 import redis
 
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 
 def _toKey(str):
     ''' lowercase and underscore a string '''
@@ -207,7 +207,7 @@ if __name__ == '__main__':
                 if not len(sys.argv) > ii+1:
                     raise Exception('-m option requires dataset name')
                 ii+=1
-                dataset = sys.argv[ii]
+                dataset = sys.argv[ii].split('|')[0]
                 meta = True
             elif sys.argv[ii] == '-n':
                 if not len(sys.argv) > ii+1:
@@ -227,4 +227,4 @@ if __name__ == '__main__':
 
     except Exception,ex:
         print 'FAIL: ' + str(ex)
-        print traceback.print_exc()
+        #print traceback.print_exc()
