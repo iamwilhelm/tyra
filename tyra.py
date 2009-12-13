@@ -4,7 +4,7 @@ import sys, json, traceback
 sys.path.append('redis')
 import redis
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 def _toKey(str):
     ''' lowercase and underscore a string '''
@@ -21,32 +21,57 @@ class Tyra:
         """
         >>> tyra = Tyra(2)
         >>> print tyra.lookup('Oil')
-        ['oil|production', 'oil', 'oil|consumption`heat', 'oil|consumption`kill', 'oil|consumption', 'oil|consumption`motor', 'oil|total']
+        [{'dim': 'oil|production', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`heat', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`kill', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`motor', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|total', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}]
         >>> print tyra.lookup('oil')
-        ['oil|production', 'oil', 'oil|consumption`heat', 'oil|consumption`kill', 'oil|consumption', 'oil|consumption`motor', 'oil|total']
+        [{'dim': 'oil|production', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`heat', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`kill', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`motor', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|total', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}]
         >>> print tyra.lookup('Gold')
         []
         >>> print tyra.lookup('heat')
-        ['oil|consumption`heat']
+        [{'dim': 'oil|consumption`heat', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}]
         >>> print tyra.lookup('consumption')
-        ['oil|consumption`heat', 'oil|consumption`kill', 'oil|consumption', 'oil|consumption`motor']
+        [{'dim': 'oil|consumption`heat', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`kill', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'oil|consumption`motor', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}]
         >>> print tyra.lookup('Pygmy')
-        ['whales|pygmy_whale']
+        [{'dim': 'whales|pygmy_whale', 'descr': 'Whale Population', 'default': 'State', 'publishDate': '1985', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_whales.csv', 'units': 'Animals'}]
         >>> print tyra.lookup('pygmy')
-        ['whales|pygmy_whale']
+        [{'dim': 'whales|pygmy_whale', 'descr': 'Whale Population', 'default': 'State', 'publishDate': '1985', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_whales.csv', 'units': 'Animals'}]
         >>> print tyra.lookup('Banks')
-        ['number_of_banks']
+        [{'dim': 'number_of_banks', 'descr': 'Total Number of Banks by year', 'default': 'Year', 'publishDate': '1980', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_banks.csv', 'units': 'Buildings'}]
         >>> print tyra.lookup('hump heat')
-        ['oil|consumption`heat', 'whales|humpback_whale']
+        [{'dim': 'oil|consumption`heat', 'descr': 'Info about oil', 'default': 'Year', 'publishDate': '1995', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_oil_1995.csv', 'units': 'Barrels'}, {'dim': 'whales|humpback_whale', 'descr': 'Whale Population', 'default': 'State', 'publishDate': '1985', 'sourceName': 'fake', 'url': 'http://www.graphbug.com/fakedata_whales.csv', 'units': 'Animals'}]
         """
         ret = []
 
+        # get list of dimensions
         self.db.select(self.searchDbNum)
-        keys = set([])
+        dimensions = set([])
         for tt in searchStr.lower().split():
-            keys = keys.union(self.db.keys("*"+tt+"*"))
+            dimensions = dimensions.union(self.db.keys("*"+tt+"*"))
+        dimensions = map(str, dimensions)
 
-        return map(str, keys)
+        # lookup each dimension's metadata
+        self.db.select(self.dataDbNum)
+        for dd in dimensions:
+            if '|' in dd:
+                ds, dim = dd.split('|')
+            else:
+                ds = dd.split('|')[0]
+                dim = None
+            meta = json.loads(self.db.get(_toKey(ds)))
+            if dim != None and dim in meta['units']:
+                unitsKey = dim
+            else:
+                unitsKey = 'default'
+            sourceVal = meta['sources'].values()[0]
+            ret.append({'dim': dd,
+                        'descr': str(meta['descr']),
+                        'units': str(meta['units'][unitsKey]),
+                        'default': str(meta['default']),
+                        'url': str(sourceVal['url']),
+                        'sourceName': str(sourceVal['source']),
+                        'publishDate':str(sourceVal['publishDate'])
+                        })
+
+        return ret
 
     def getData(self, dimension, xAxis=None, xAxisLabels=None, zAxis=None):
         """
@@ -218,7 +243,7 @@ if __name__ == '__main__':
 
         if lookup:
             dw = Tyra(dbNum)
-            print '\n'.join( str(x[0])+'. '+x[1] for x in enumerate(dw.lookup(search), 1) )
+            print '\n'.join( str(x[0])+'. '+x[1] for x in enumerate([ x['dim'] for x in dw.lookup(search) ], 1) )
         elif meta:
             dw = Tyra(dbNum+1)
             dw.printMeta(dataset)
