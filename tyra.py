@@ -4,7 +4,7 @@ import sys, json, traceback
 sys.path.append('redis')
 import redis
 
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 
 def _tokey(str):
     ''' lowercase and underscore a string '''
@@ -244,7 +244,11 @@ if __name__ == '__main__':
 
         if lookup:
             dw = Tyra(dbnum)
-            print '\n'.join( str(x[0]) + '. ' + x[1] for x in enumerate([ x['dim'] for x in dw.lookup(search) ], 1) )
+            results = dw.lookup(search)
+            if len(results) == 0:
+                print 'result set empty'
+            else:
+                print '\n'.join( str(x[0]) + '. ' + x[1] for x in enumerate([ x['dim'] for x in results ], 1) )
         elif meta:
             dw = Tyra(dbnum + 1)
             dw.printMeta(dataset)
