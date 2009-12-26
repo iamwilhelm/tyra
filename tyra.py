@@ -12,7 +12,7 @@ def _tokey(str):
 
         
 class Tyra:
-    def __init__(self, dbnum=0, host='68.55.32.96'):
+    def __init__(self, dbnum=0, host='localhost'):
         '''creates the dw reference'''
         self.dw = redis.Redis(host=host, db=dbnum)
         self.search_db_num = dbnum
