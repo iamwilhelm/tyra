@@ -63,7 +63,9 @@ class Tyra:
             else:
                 unitskey = 'default'
             sourceval = meta['sources'].values()[0]
+            
             ret.append({'dim': dd,
+                        # 'dims': [dd] + [x for x in meta['dims']],
                         'description': str(meta['descr']),
                         'units': str(meta['units'][unitskey]),
                         'default': str(meta['default']),
@@ -174,11 +176,26 @@ class Tyra:
         ret['source'] = source
         return ret
 
-    def printMeta(self, dataset):
+    def getMetaData(self, dataset):
+        """
+        >>> tyra = Tyra(2)
+        >>> print tyra.getMetaData('Oil')
+        {u'descr': u'Info about oil', u'sources': {u'1995': {u'url': u'http://www.graphbug.com/fakedata_oil_1995.csv', u'source': u'fake', u'publishDate': u'1995', u'license': u'Public Domain'}, u'1997': {u'url': u'http://www.graphbug.com/fakedata_oil_1997.csv', u'source': u'fake', u'publishDate': u'1997', u'license': u'Public Domain'}, u'1996': {u'url': u'http://www.graphbug.com/fakedata_oil_1996.csv', u'source': u'fake', u'publishDate': u'1996', u'license': u'Public Domain'}, u'1999': {u'url': u'http://www.graphbug.com/fakedata_oil_1999.csv', u'source': u'fake', u'publishDate': u'1999', u'license': u'Public Domain'}, u'1998': {u'url': u'http://www.graphbug.com/fakedata_oil_1998.csv', u'source': u'fake', u'publishDate': u'1998', u'license': u'Public Domain'}, u'2000': {u'url': u'http://www.graphbug.com/fakedata_oil_2000.csv', u'source': u'fake', u'publishDate': u'2000', u'license': u'Public Domain'}}, u'default': u'Year', u'otherDims': [u'Year'], u'dims': {u'Category': [u'Consumption`Heat', u'Production', u'Consumption`Kill', u'Consumption', u'Consumption`Motor', u'Total'], u'State': [u'Mississippi', u'Northeast', u'West', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Midwest', u'Idaho', u'Arizona', u'Iowa', u'Louisiana', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'South', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island'], u'Year': [u'2000', u'1995', u'1997', u'1996', u'1999', u'1998', u'Total']}, u'units': {u'default': u'Barrels'}}
+        >>> print tyra.getMetaData('oil')
+        {u'descr': u'Info about oil', u'sources': {u'1995': {u'url': u'http://www.graphbug.com/fakedata_oil_1995.csv', u'source': u'fake', u'publishDate': u'1995', u'license': u'Public Domain'}, u'1997': {u'url': u'http://www.graphbug.com/fakedata_oil_1997.csv', u'source': u'fake', u'publishDate': u'1997', u'license': u'Public Domain'}, u'1996': {u'url': u'http://www.graphbug.com/fakedata_oil_1996.csv', u'source': u'fake', u'publishDate': u'1996', u'license': u'Public Domain'}, u'1999': {u'url': u'http://www.graphbug.com/fakedata_oil_1999.csv', u'source': u'fake', u'publishDate': u'1999', u'license': u'Public Domain'}, u'1998': {u'url': u'http://www.graphbug.com/fakedata_oil_1998.csv', u'source': u'fake', u'publishDate': u'1998', u'license': u'Public Domain'}, u'2000': {u'url': u'http://www.graphbug.com/fakedata_oil_2000.csv', u'source': u'fake', u'publishDate': u'2000', u'license': u'Public Domain'}}, u'default': u'Year', u'otherDims': [u'Year'], u'dims': {u'Category': [u'Consumption`Heat', u'Production', u'Consumption`Kill', u'Consumption', u'Consumption`Motor', u'Total'], u'State': [u'Mississippi', u'Northeast', u'West', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Midwest', u'Idaho', u'Arizona', u'Iowa', u'Louisiana', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'South', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island'], u'Year': [u'2000', u'1995', u'1997', u'1996', u'1999', u'1998', u'Total']}, u'units': {u'default': u'Barrels'}}
+        >>> print tyra.getMetaData('whales')
+        {u'descr': u'Whale Population', u'sources': {u'default': {u'url': u'http://www.graphbug.com/fakedata_whales.csv', u'source': u'fake', u'publishDate': u'1985', u'license': u'Public Domain'}}, u'default': u'State', u'otherDims': [], u'dims': {u'Category': [u'Sperm Whale', u'Humpback Whale', u'Grey Whale', u'Pygmy Whale', u'Blue Whale', u'Total'], u'State': [u'Mississippi', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Louisiana', u'Idaho', u'Arizona', u'Iowa', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island']}, u'units': {u'default': u'Animals'}}
+        >>> print tyra.getMetaData('peanut_butter')
+        {u'descr': u'Uses of Peanut Butter', u'sources': {u'default': {u'url': u'http://www.graphbug.com/fakedata_pb.csv', u'source': u'fake', u'publishDate': u'2009', u'license': u'Public Domain'}}, u'default': u'State', u'otherDims': [], u'dims': {u'Category': [u'Donut', u'Hair Product', u'Lubricant', u'Smores', u'Cerial', u'PBJ', u'Total'], u'State': [u'Mississippi', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Louisiana', u'Idaho', u'Arizona', u'Iowa', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island']}, u'units': {u'Cerial': u'Tons', u'Donut': u'Tons', u'Hair Product': u'Gallons', u'Lubricant': u'Gallons', u'Smores': u'Tons', u'PBJ': u'Tons'}}
+        """
         dataset = _tokey(dataset)
+        self.dw.select(self.data_db_num)
         if not self.dw.exists(dataset):
-            raise Exception("dataset not found")
-        meta = json.loads(self.dw.get(dataset))
+            raise Exception("Dataset not found")
+        return json.loads(self.dw.get(dataset))
+
+    def printMeta(self, dataset):
+        meta = self.getMetaData(dataset)
 
         print '\n' + dataset
         print str(meta['descr'])
