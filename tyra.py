@@ -191,7 +191,7 @@ class Tyra:
         >>> print tyra.getMetaData('whales')
         {u'descr': u'Whale Population', u'sources': {u'default': {u'url': u'http://www.graphbug.com/fakedata_whales.csv', u'source': u'fake', u'publishDate': u'1985', u'license': u'Public Domain'}}, u'default': u'State', u'otherDims': [], u'dims': {u'Category': [u'Sperm Whale', u'Humpback Whale', u'Grey Whale', u'Pygmy Whale', u'Blue Whale', u'Total'], u'State': [u'Mississippi', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Louisiana', u'Idaho', u'Arizona', u'Iowa', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island']}, u'units': {u'default': u'Animals'}}
         >>> print tyra.getMetaData('peanut_butter')
-        {u'descr': u'Uses of Peanut Butter', u'sources': {u'default': {u'url': u'http://www.graphbug.com/fakedata_pb.csv', u'source': u'fake', u'publishDate': u'2009', u'license': u'Public Domain'}}, u'default': u'State', u'otherDims': [], u'dims': {u'Category': [u'Donut', u'Hair Product', u'Lubricant', u'Smores', u'Cerial', u'PBJ', u'Total'], u'State': [u'Mississippi', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Louisiana', u'Idaho', u'Arizona', u'Iowa', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island']}, u'units': {u'Cerial': u'Tons', u'Donut': u'Tons', u'Hair Product': u'Gallons', u'Lubricant': u'Gallons', u'Smores': u'Tons', u'PBJ': u'Tons'}}
+        {u'descr': u'Uses of Peanut Butter', u'sources': {u'default': {u'url': u'http://www.graphbug.com/fakedata_pb.csv', u'source': u'fake', u'publishDate': u'2009', u'license': u'Public Domain'}}, u'default': u'State', u'otherDims': [], u'dims': {u'Category': [u'Donut', u'Hair Product', u'Lubricant', u'Smores', u'Cerial', u'PBJ', u'Total'], u'State': [u'Mississippi', u'Oklahoma', u'Delaware', u'Minnesota', u'Illinois', u'Georgia', u'Arkansas', u'New Mexico', u'Ohio', u'Indiana', u'Maryland', u'Louisiana', u'Idaho', u'Arizona', u'Iowa', u'Michigan', u'Kansas', u'Utah', u'Virginia', u'Oregon', u'Connecticut', u'Montana', u'California', u'Massachusetts', u'West Virginia', u'South Carolina', u'New Hampshire', u'Vermont', u'Wyoming', u'North Dakota', u'Pennsylvania', u'Florida', u'Alaska', u'Kentucky', u'Hawaii', u'Nebraska', u'Missouri', u'Wisconsin', u'Alabama', u'New York', u'Total', u'South Dakota', u'Colorado', u'New Jersey', u'Washington', u'North Carolina', u'Tennessee', u'District of Columbia', u'Texas', u'Nevada', u'Maine', u'Rhode Island']}, u'units': {u'cerial': u'Tons', u'donut': u'Tons', u'hair_product': u'Gallons', u'lubricant': u'Gallons', u'smores': u'Tons', u'pbj': u'Tons'}}
         """
         dataset = _tokey(dataset)
         self.dw.select(self.data_db_num)
@@ -264,15 +264,14 @@ if __name__ == '__main__':
                 dbnum = int(sys.argv[ii])
             ii += 1
 
+        dw = Tyra(dbnum)
         if lookup:
-            dw = Tyra(dbnum)
             results = dw.lookup(search)
             if len(results) == 0:
                 print 'result set empty'
             else:
                 print '\n'.join( str(x[0]) + '. ' + x[1] for x in enumerate([ x['dim'] for x in results ], 1) )
         elif meta:
-            dw = Tyra(dbnum + 1)
             dw.printMeta(dataset)
         else:
             printHelp()
