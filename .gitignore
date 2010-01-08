@@ -1,1 +1,21 @@
+# ignore emacs and other backup files
+*~
+\#*\#
+.\#*
+
+# various rails files should be ignored
+.autotest
+log/*
+tmp/*
+doc/app/*
+coverage/*
+.DS_Store
+**/.DS_Store
+.dotest/*
+
+# various django files should be ignored
 *.pyc
+
+# specific project files to be ignored
+simple_importer/test_data
+
