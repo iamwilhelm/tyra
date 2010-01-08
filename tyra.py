@@ -4,7 +4,7 @@ import sys, json, traceback
 sys.path.append('redis')
 import redis
 
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 
 def _tokey(str):
     ''' lowercase and underscore a string '''
@@ -58,10 +58,15 @@ class Tyra:
                 ds = dd.split('|')[0]
                 dim = None
             meta = json.loads(self.dw.get(_tokey(ds)))
+
+            if dim == None and 'default' not in meta['units']:
+                continue
+
             if dim != None and dim in meta['units']:
-                unitskey = dim
+                unitskey = _tokey(dim)
             else:
                 unitskey = 'default'
+
             sourceval = meta['sources'].values()[0]
             ret.append({'dim': dd,
                         'description': str(meta['descr']),
@@ -145,8 +150,8 @@ class Tyra:
         data = map(str, self.dw.mget(*datakeys))
 
         # find units and sources
-        if caty != None and caty in meta['units']:
-            units = str(meta['units'][caty])
+        if caty != None and _tokey(caty) in meta['units']:
+            units = str(meta['units'][_tokey(caty)])
         elif 'default' in meta['units']:
             units = str(meta['units']['default'])
         else:
